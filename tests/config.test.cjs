@@ -57,6 +57,9 @@ describe('config-ensure-section command', () => {
     assert.strictEqual(typeof config.workflow.plan_check, 'boolean');
     assert.strictEqual(typeof config.workflow.verifier, 'boolean');
     assert.strictEqual(typeof config.workflow.nyquist_validation, 'boolean');
+    assert.ok(config.discussion && typeof config.discussion === 'object', 'discussion should be an object');
+    assert.strictEqual(typeof config.discussion.mode, 'string');
+    assert.strictEqual(typeof config.discussion.area_selection, 'string');
     // These hardcoded defaults are always present (may be overridden by user defaults)
     assert.ok('model_profile' in config, 'model_profile should exist');
     assert.ok('brave_search' in config, 'brave_search should exist');
@@ -155,6 +158,46 @@ describe('config-ensure-section command', () => {
 
   // NOTE: This test touches ~/.gsd/ on the real filesystem. It uses save/restore
   // try/finally and skips if the file already exists to avoid corrupting user config.
+
+  // NOTE: This test touches ~/.gsd/ on the real filesystem. It uses save/restore
+  // try/finally and skips if the file already exists to avoid corrupting user config.
+  test('merges nested discussion keys from defaults.json preserving unset keys', () => {
+    const homedir = os.homedir();
+    const gsdDir = path.join(homedir, '.gsd');
+    const defaultsFile = path.join(gsdDir, 'defaults.json');
+
+    let existingDefaults = null;
+    const gsdDirExisted = fs.existsSync(gsdDir);
+    if (fs.existsSync(defaultsFile)) {
+      existingDefaults = fs.readFileSync(defaultsFile, 'utf-8');
+    }
+
+    try {
+      if (!gsdDirExisted) {
+        fs.mkdirSync(gsdDir, { recursive: true });
+      }
+      fs.writeFileSync(defaultsFile, JSON.stringify({
+        discussion: { mode: 'recommended' },
+      }), 'utf-8');
+
+      const result = runGsdTools('config-ensure-section', tmpDir);
+      assert.ok(result.success, `Command failed: ${result.error}`);
+
+      const config = readConfig(tmpDir);
+      assert.strictEqual(config.discussion.mode, 'recommended', 'mode should be overridden');
+      assert.strictEqual(typeof config.discussion.area_selection, 'string', 'area_selection should be preserved');
+    } finally {
+      if (existingDefaults !== null) {
+        fs.writeFileSync(defaultsFile, existingDefaults, 'utf-8');
+      } else {
+        try { fs.unlinkSync(defaultsFile); } catch { /* ignore */ }
+      }
+      if (!gsdDirExisted) {
+        try { fs.rmdirSync(gsdDir); } catch { /* ignore */ }
+      }
+    }
+  });
+
   test('merges nested workflow keys from defaults.json preserving unset keys', () => {
     const homedir = os.homedir();
     const gsdDir = path.join(homedir, '.gsd');

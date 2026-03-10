@@ -63,6 +63,10 @@ function cmdConfigEnsureSection(cwd, raw) {
       verifier: true,
       nyquist_validation: true,
     },
+    discussion: {
+      mode: 'manual',
+      area_selection: 'manual',
+    },
     parallelization: true,
     brave_search: hasBraveSearch,
   };
@@ -70,6 +74,7 @@ function cmdConfigEnsureSection(cwd, raw) {
     ...hardcoded,
     ...userDefaults,
     workflow: { ...hardcoded.workflow, ...(userDefaults.workflow || {}) },
+    discussion: { ...hardcoded.discussion, ...(userDefaults.discussion || {}) },
   };
 
   try {

@@ -334,6 +334,10 @@ If everything passes, you move on. If something's broken, you don't manually deb
 
 ```
 /gsd:discuss-phase 2
+# Auto-resolve all gray areas with recommended choices, then continue to plan/execute
+/gsd:discuss-phase 2 --auto --discussion-mode recommended
+# Alias:
+/gsd:discuss-phase 2 --auto --all-gray-areas --accept-recommended
 /gsd:plan-phase 2
 /gsd:execute-phase 2
 /gsd:verify-work 2
@@ -467,7 +471,7 @@ You're never locked in. The system adapts.
 | Command | What it does |
 |---------|--------------|
 | `/gsd:new-project [--auto]` | Full initialization: questions → research → requirements → roadmap |
-| `/gsd:discuss-phase [N] [--auto]` | Capture implementation decisions before planning |
+| `/gsd:discuss-phase [N] [--auto] [--discussion-mode recommended]` | Capture implementation decisions before planning (manual or recommended auto-discuss) |
 | `/gsd:plan-phase [N] [--auto]` | Research + plan + verify for a phase |
 | `/gsd:execute-phase <N>` | Execute all plans in parallel waves, verify when complete |
 | `/gsd:verify-work [N]` | Manual user acceptance testing ¹ |
@@ -561,6 +565,8 @@ These spawn additional agents during planning/execution. They improve quality bu
 | `workflow.plan_check` | `true` | Verifies plans achieve phase goals before execution |
 | `workflow.verifier` | `true` | Confirms must-haves were delivered after execution |
 | `workflow.auto_advance` | `false` | Auto-chain discuss → plan → execute without stopping |
+| `discussion.mode` | `manual` | Discuss decision mode: `manual`, `first-option`, or `recommended` |
+| `discussion.area_selection` | `manual` | Discuss area selection: ask user (`manual`) or auto-select all gray areas (`all`) |
 
 Use `/gsd:settings` to toggle these, or override per-invocation:
 - `/gsd:plan-phase --skip-research`
