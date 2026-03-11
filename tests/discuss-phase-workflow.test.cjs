@@ -33,8 +33,8 @@ describe('discuss-phase recommended automation', () => {
     assert.match(workflow, /choose the \*\*recommended\*\* option/);
   });
 
-  test('recommended mode stops and asks when recommendation missing', () => {
-    assert.match(workflow, /has no explicit recommended option, stop automation/i);
+  test('recommended mode falls back to You decide when recommendation missing', () => {
+    assert.match(workflow, /no explicit recommended option, record fallback as \*\*"You decide"\*\*/i);
   });
 
   test('reruns are idempotent and skip already resolved gray areas', () => {

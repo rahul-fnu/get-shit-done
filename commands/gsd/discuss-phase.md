@@ -52,7 +52,7 @@ Context files are resolved in-workflow using `init phase-op` and roadmap/state t
 10. Offer next steps (research or plan)
 
 **Automation flags:**
-- `--discussion-mode recommended` → auto discussion chooses recommended options (never guesses)
+- `--discussion-mode recommended` → auto discussion chooses recommended options; if recommendation is missing, fallback is "You decide" for execution
 - `--all-gray-areas --accept-recommended` → alias pair for the same behavior
 - `--all-gray-areas` maps to `discussion.area_selection=all`
 - `--accept-recommended` maps to `discussion.mode=recommended`

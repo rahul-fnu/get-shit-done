@@ -13,7 +13,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - Discuss workflow resume behavior is stage-aware/idempotent: skips already-resolved gray areas and continues unresolved work without duplicating decisions
-- Recommended auto-discuss now stops and asks when no recommended option exists (no guessing)
+- Recommended auto-discuss now falls back to "You decide" when no recommended option exists (no guessing)
 
 
 ## [1.22.4] - 2026-03-03

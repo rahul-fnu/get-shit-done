@@ -338,6 +338,7 @@ If everything passes, you move on. If something's broken, you don't manually deb
 /gsd:discuss-phase 2 --auto --discussion-mode recommended
 # Alias:
 /gsd:discuss-phase 2 --auto --all-gray-areas --accept-recommended
+# If a recommendation is missing for an area, fallback is "You decide" for execution
 /gsd:plan-phase 2
 /gsd:execute-phase 2
 /gsd:verify-work 2

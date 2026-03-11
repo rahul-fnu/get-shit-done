@@ -422,7 +422,7 @@ For each selected area, conduct a focused discussion loop.
 - `discussion.mode=recommended` + auto selection of all unresolved areas → choose the **recommended** option for each question and area.
 
 In recommended mode, never guess:
-- If a gray area has no explicit recommended option, stop automation at that area and ask the user directly.
+- If a gray area has no explicit recommended option, record fallback as **"You decide"** so execution can proceed with Claude discretion for that area.
 - Keep already-persisted decisions; do not roll back prior areas.
 
 **Philosophy: 4 questions, then check (manual mode).**
