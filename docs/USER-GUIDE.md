@@ -192,7 +192,7 @@ enabled, or after `/gsd:audit-milestone` surfaces Nyquist compliance gaps.
 |---------|---------|-------------|
 | `/gsd:new-project` | Full project init: questions, research, requirements, roadmap | Start of a new project |
 | `/gsd:new-project --auto @idea.md` | Automated init from document | Have a PRD or idea doc ready |
-| `/gsd:discuss-phase [N] [--auto] [--discussion-mode recommended]` | Capture implementation decisions | Before planning; can auto-resolve gray areas with recommended mode |
+| `/gsd:discuss-phase [N]` | Capture implementation decisions | Before planning, to shape how it gets built |
 | `/gsd:plan-phase [N]` | Research + plan + verify | Before executing a phase |
 | `/gsd:execute-phase <N>` | Execute all plans in parallel waves | After planning is complete |
 | `/gsd:verify-work [N]` | Manual UAT with auto-diagnosis | After execution completes |
@@ -237,31 +237,6 @@ enabled, or after `/gsd:audit-milestone` surfaces Nyquist compliance gaps.
 
 ---
 
-### Discuss Auto Modes
-
-Recommended autonomous discuss flow:
-
-```bash
-/gsd:discuss-phase 2 --auto --discussion-mode recommended
-```
-
-Alias form (equivalent):
-
-```bash
-/gsd:discuss-phase 2 --auto --all-gray-areas --accept-recommended
-```
-
-Behavior:
-- Discovers discussable gray areas for the phase
-- Skips already-resolved areas from existing `CONTEXT.md` (stage-aware resume)
-- Selects all unresolved gray areas when area selection is `all`
-- Chooses the **recommended option** for each area (not first option)
-- Persists decisions incrementally to `CONTEXT.md`/`STATE.md` so reruns are safe and resumable
-- If any area lacks a recommended option, automation stops and asks the user instead of guessing
-- When `--auto` or `workflow.auto_advance=true`, chains into plan → execute with normal gates
-
----
-
 ## Configuration Reference
 
 GSD stores project settings in `.planning/config.json`. Configure during `/gsd:new-project` or update later with `/gsd:settings`.
@@ -282,10 +257,6 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd:n
     "plan_check": true,
     "verifier": true,
     "nyquist_validation": true
-  },
-  "discussion": {
-    "mode": "manual",
-    "area_selection": "manual"
   },
   "git": {
     "branching_strategy": "none",
@@ -322,15 +293,6 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd:n
 | `workflow.nyquist_validation` | `true`, `false` | `true` | Validation architecture research during plan-phase; 8th plan-check dimension |
 
 Disable these to speed up phases in familiar domains or when conserving tokens.
-
-### Discussion Settings
-
-| Setting | Options | Default | What it Controls |
-|---------|---------|---------|------------------|
-| `discussion.mode` | `manual`, `first-option`, `recommended` | `manual` | How discuss choices are made in auto flows |
-| `discussion.area_selection` | `manual`, `all` | `manual` | Whether discuss prompts for gray-area selection or auto-selects all unresolved areas |
-
-`--all-gray-areas` maps to `discussion.area_selection=all`. `--accept-recommended` maps to `discussion.mode=recommended`.
 
 ### Git Branching
 
