@@ -127,7 +127,7 @@ Use /gsd:progress to see available phases.
 ```
 Exit workflow.
 
-**If `phase_found` is true:** Continue to check_existing.
+**If `phase_found` is true:** Continue to resolve_discussion_mode.
 </step>
 
 <step name="resolve_discussion_mode">

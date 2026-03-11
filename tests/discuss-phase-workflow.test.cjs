@@ -15,6 +15,11 @@ describe('discuss-phase recommended automation', () => {
     assert.match(workflow, /--discussion-mode <manual\|first-option\|recommended>/);
   });
 
+
+  test('initialize routes through resolve_discussion_mode before check_existing', () => {
+    assert.match(workflow, /If `phase_found` is true:\*\* Continue to resolve_discussion_mode\./);
+    assert.match(workflow, /<step name="resolve_discussion_mode">/);
+  });
   test('alias mapping covers all-gray-areas and accept-recommended', () => {
     assert.match(command, /--all-gray-areas --accept-recommended/);
     assert.match(workflow, /--all-gray-areas/);
