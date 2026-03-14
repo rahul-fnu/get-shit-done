@@ -471,7 +471,7 @@ You're never locked in. The system adapts.
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd:new-project [--auto]` | Full initialization: questions → research → requirements → roadmap |
+| `/gsd:new-project [--auto] [--headless]` | Full initialization: questions → research → requirements → roadmap |
 | `/gsd:discuss-phase [N] [--auto] [--discussion-mode recommended]` | Capture implementation decisions before planning (manual or recommended auto-discuss) |
 | `/gsd:plan-phase [N] [--auto]` | Research + plan + verify for a phase |
 | `/gsd:execute-phase <N>` | Execute all plans in parallel waves, verify when complete |
@@ -565,6 +565,7 @@ These spawn additional agents during planning/execution. They improve quality bu
 | `workflow.research` | `true` | Researches domain before planning each phase |
 | `workflow.plan_check` | `true` | Verifies plans achieve phase goals before execution |
 | `workflow.verifier` | `true` | Confirms must-haves were delivered after execution |
+| `workflow.headless` | `false` | Fully autonomous mode — auto-approves all gates, skips UAT |
 | `workflow.auto_advance` | `false` | Auto-chain discuss → plan → execute without stopping |
 | `discussion.mode` | `manual` | Discuss decision mode: `manual`, `first-option`, or `recommended` |
 | `discussion.area_selection` | `manual` | Discuss area selection: ask user (`manual`) or auto-select all gray areas (`all`) |

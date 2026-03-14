@@ -57,6 +57,8 @@ describe('config-ensure-section command', () => {
     assert.strictEqual(typeof config.workflow.plan_check, 'boolean');
     assert.strictEqual(typeof config.workflow.verifier, 'boolean');
     assert.strictEqual(typeof config.workflow.nyquist_validation, 'boolean');
+    assert.strictEqual(typeof config.workflow.headless, 'boolean');
+    assert.strictEqual(config.workflow.headless, false, 'headless should default to false');
     assert.ok(config.discussion && typeof config.discussion === 'object', 'discussion should be an object');
     assert.strictEqual(typeof config.discussion.mode, 'string');
     assert.strictEqual(typeof config.discussion.area_selection, 'string');

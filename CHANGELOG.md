@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `--headless` flag for `/gsd:new-project` — fully autonomous mode for containerized execution. Implies `--auto`, skips all config questions (uses recommended defaults), auto-approves human-action checkpoints, auto-retries then skips verification failures, auto-marks incomplete plans complete, skips UAT. Config key: `workflow.headless`
 - Discuss-phase recommended automation mode: `/gsd:discuss-phase <phase> --auto --discussion-mode recommended`
 - Discuss alias flags: `--all-gray-areas` + `--accept-recommended`
 - Persistent config keys: `discussion.mode` and `discussion.area_selection`

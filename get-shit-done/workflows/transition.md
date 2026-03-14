@@ -83,6 +83,12 @@ Wait for confirmation before proceeding.
 
 **If plans incomplete:**
 
+Read headless config: `HEADLESS=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get workflow.headless 2>/dev/null || echo "false")`
+
+**If headless=true:** Auto-select "Mark complete anyway". Log `⚠ HEADLESS: Marking phase complete with incomplete plans: [list of missing plans]`. Continue to cleanup_handoff step.
+
+**If headless=false:**
+
 **SAFETY RAIL: always_confirm_destructive applies here.**
 Skipping incomplete plans is destructive — ALWAYS prompt regardless of mode.
 

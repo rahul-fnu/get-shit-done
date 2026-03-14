@@ -10,6 +10,9 @@ Read all files referenced by the invoking prompt's execution_context before star
 ## Auto Mode Detection
 
 Check if `--auto` flag is present in $ARGUMENTS.
+Check if `--headless` flag is present in $ARGUMENTS.
+
+**If `--headless`:** Implies `--auto`. Treat as auto mode with additional overrides below.
 
 **If auto mode:**
 - Skip brownfield mapping offer (assume greenfield)
@@ -20,6 +23,17 @@ Check if `--auto` flag is present in $ARGUMENTS.
   - Requirements: Include all table stakes + features from provided document
   - Requirements approval: Auto-approve
   - Roadmap approval: Auto-approve
+
+**If headless mode (additional overrides on top of auto):**
+- Skip ALL config questions (Step 2a) — use recommended defaults for everything:
+  - Granularity: coarse
+  - Parallelization: true
+  - Commit docs: true
+  - Model profile: balanced
+  - All workflow agents: true (research, plan_check, verifier, nyquist_validation)
+- Set `workflow.headless: true` in config.json
+- Set `discussion.mode: "recommended"`, `discussion.area_selection: "all"`
+- Everything else same as `--auto`
 
 **Document requirement:**
 Auto mode requires an idea document — either:
@@ -82,7 +96,33 @@ Exit command.
 
 ## 2a. Auto Mode Config (auto mode only)
 
-**If auto mode:** Collect config settings upfront before processing the idea document.
+**If headless mode:** Skip all config questions — use recommended defaults directly:
+
+```json
+{
+  "mode": "yolo",
+  "granularity": "coarse",
+  "parallelization": true,
+  "commit_docs": true,
+  "model_profile": "balanced",
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true,
+    "nyquist_validation": true,
+    "headless": true,
+    "auto_advance": true
+  },
+  "discussion": {
+    "mode": "recommended",
+    "area_selection": "all"
+  }
+}
+```
+
+Write config.json, commit it, set `workflow._auto_chain_active true`, and skip to Step 4.
+
+**If auto mode (not headless):** Collect config settings upfront before processing the idea document.
 
 YOLO mode is implicit (auto = YOLO). Ask remaining config questions:
 

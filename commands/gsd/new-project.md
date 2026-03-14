@@ -1,7 +1,7 @@
 ---
 name: gsd:new-project
 description: Initialize a new project with deep context gathering and PROJECT.md
-argument-hint: "[--auto]"
+argument-hint: "[--auto] [--headless]"
 allowed-tools:
   - Read
   - Bash
@@ -12,6 +12,7 @@ allowed-tools:
 <context>
 **Flags:**
 - `--auto` — Automatic mode. After config questions, runs research → requirements → roadmap without further interaction. Expects idea document via @ reference.
+- `--headless` — Fully autonomous mode for containerized execution. Implies --auto. Skips all config questions (uses recommended defaults), auto-approves human-action checkpoints, auto-retries then skips verification failures, skips UAT.
 </context>
 
 <objective>

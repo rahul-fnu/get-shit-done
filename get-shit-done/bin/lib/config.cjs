@@ -62,6 +62,7 @@ function cmdConfigEnsureSection(cwd, raw) {
       plan_check: true,
       verifier: true,
       nyquist_validation: true,
+      headless: false,
     },
     discussion: {
       mode: 'manual',
