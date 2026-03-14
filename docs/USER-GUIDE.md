@@ -192,6 +192,7 @@ enabled, or after `/gsd:audit-milestone` surfaces Nyquist compliance gaps.
 |---------|---------|-------------|
 | `/gsd:new-project` | Full project init: questions, research, requirements, roadmap | Start of a new project |
 | `/gsd:new-project --auto @idea.md` | Automated init from document | Have a PRD or idea doc ready |
+| `/gsd:new-project --headless @idea.md` | Fully autonomous init (no interaction) | Docker/CI containers |
 | `/gsd:discuss-phase [N]` | Capture implementation decisions | Before planning, to shape how it gets built |
 | `/gsd:plan-phase [N]` | Research + plan + verify | Before executing a phase |
 | `/gsd:execute-phase <N>` | Execute all plans in parallel waves | After planning is complete |
@@ -256,7 +257,8 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd:n
     "research": true,
     "plan_check": true,
     "verifier": true,
-    "nyquist_validation": true
+    "nyquist_validation": true,
+    "headless": false
   },
   "git": {
     "branching_strategy": "none",
@@ -291,6 +293,7 @@ GSD stores project settings in `.planning/config.json`. Configure during `/gsd:n
 | `workflow.plan_check` | `true`, `false` | `true` | Plan verification loop (up to 3 iterations) |
 | `workflow.verifier` | `true`, `false` | `true` | Post-execution verification against phase goals |
 | `workflow.nyquist_validation` | `true`, `false` | `true` | Validation architecture research during plan-phase; 8th plan-check dimension |
+| `workflow.headless` | `true`, `false` | `false` | Fully autonomous mode — auto-approves all human gates, skips UAT |
 
 Disable these to speed up phases in familiar domains or when conserving tokens.
 
@@ -361,6 +364,25 @@ claude --dangerously-skip-permissions
 /clear
 /gsd:discuss-phase 1               # Normal flow from here
 ```
+
+### Containerized / Headless Execution
+
+For fully autonomous execution in Docker containers or CI pipelines where no human interaction is possible:
+
+```bash
+/gsd:new-project --headless @prd.md
+```
+
+`--headless` implies `--auto` and additionally:
+- Skips all config questions (uses recommended defaults)
+- Sets `workflow.headless: true` so all downstream workflows auto-approve gates
+- Auto-approves human-action checkpoints (assumes pre-auth)
+- Auto-retries then skips verification failures
+- Auto-marks incomplete plans complete at transition
+- Skips UAT (`/gsd:verify-work`)
+- Sets `discussion.mode: "recommended"` and `discussion.area_selection: "all"`
+
+The full loop runs unattended: new-project → discuss → plan → execute → verify → transition for every phase.
 
 ### Existing Codebase
 

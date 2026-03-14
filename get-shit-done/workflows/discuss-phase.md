@@ -127,7 +127,39 @@ Use /gsd:progress to see available phases.
 ```
 Exit workflow.
 
-**If `phase_found` is true:** Continue to check_existing.
+**If `phase_found` is true:** Continue to resolve_discussion_mode.
+</step>
+
+<step name="resolve_discussion_mode">
+Resolve discussion behavior from flags + config, preserving backward compatibility.
+
+Supported inputs:
+- `--discussion-mode <manual|first-option|recommended>`
+- `--all-gray-areas` (alias for `discussion.area_selection=all`)
+- `--accept-recommended` (alias for `discussion.mode=recommended`)
+
+```bash
+DISC_MODE=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get discussion.mode 2>/dev/null || echo "manual")
+DISC_AREA=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get discussion.area_selection 2>/dev/null || echo "manual")
+
+if [[ "$ARGUMENTS" =~ --discussion-mode[[:space:]]+recommended ]]; then DISC_MODE="recommended"; fi
+if [[ "$ARGUMENTS" =~ --discussion-mode[[:space:]]+first-option ]]; then DISC_MODE="first-option"; fi
+if [[ "$ARGUMENTS" =~ --discussion-mode[[:space:]]+manual ]]; then DISC_MODE="manual"; fi
+
+if [[ "$ARGUMENTS" =~ --accept-recommended ]]; then DISC_MODE="recommended"; fi
+if [[ "$ARGUMENTS" =~ --all-gray-areas ]]; then DISC_AREA="all"; fi
+```
+
+Persist the resolved values to config for resumable reruns:
+```bash
+node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-set discussion.mode "$DISC_MODE"
+node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-set discussion.area_selection "$DISC_AREA"
+```
+
+Behavior matrix:
+- `manual/manual` → existing interactive flow
+- `first-option/all` + `--auto` → existing autonomous behavior
+- `recommended/all` + `--auto` → new mode: auto-discuss every unresolved gray area using recommended choices only
 </step>
 
 <step name="check_existing">
@@ -368,13 +400,32 @@ For "Organize photo library" (organization task):
 ☐ Folder structure — Flat, nested by year, or by category?
 ```
 
-Continue to discuss_areas with selected areas.
+Before prompting, do stage-aware resume detection:
+- Read existing `${phase_dir}/${padded_phase}-CONTEXT.md` (if present) and extract already-written decisions.
+- Treat areas with existing persisted decisions as resolved and skip them.
+- Build `unresolved_gray_areas` only.
+- If none unresolved, skip directly to `auto_advance` (when enabled) or `confirm_creation`.
+
+Selection behavior:
+- If `discussion.area_selection=all`, auto-select all `unresolved_gray_areas` without asking.
+- Otherwise use AskUserQuestion multi-select on unresolved areas only.
+
+Continue to discuss_areas with selected unresolved areas.
 </step>
 
 <step name="discuss_areas">
 For each selected area, conduct a focused discussion loop.
 
-**Philosophy: 4 questions, then check.**
+**Mode-aware behavior:**
+- `discussion.mode=manual` → existing interactive loop.
+- `discussion.mode=first-option` + `--auto` → existing auto behavior (first option).
+- `discussion.mode=recommended` + auto selection of all unresolved areas → choose the **recommended** option for each question and area.
+
+In recommended mode, never guess:
+- If a gray area has no explicit recommended option, record fallback as **"You decide"** so execution can proceed with Claude discretion for that area.
+- Keep already-persisted decisions; do not roll back prior areas.
+
+**Philosophy: 4 questions, then check (manual mode).**
 
 Ask 4 questions per area before offering to continue or move on. Each answer often reveals the next question.
 
@@ -408,7 +459,13 @@ Ask 4 questions per area before offering to continue or move on. Each answer oft
    If "Next area" → proceed to next selected area
    If "Other" (free text) → interpret intent: continuation phrases ("chat more", "keep going", "yes", "more") map to "More questions"; advancement phrases ("done", "move on", "next", "skip") map to "Next area". If ambiguous, ask: "Continue with more questions about [area], or move to the next area?"
 
-4. **After all initially-selected areas complete:**
+4. **After each area decision is finalized (manual or auto):**
+   - Persist immediately to `${phase_dir}/${padded_phase}-CONTEXT.md` using deterministic upsert behavior.
+   - Record a concise decision audit entry in `STATE.md`.
+   - Commit docs according to `commit_docs` policy.
+   - This makes interruption-safe resumability stage-aware and idempotent.
+
+5. **After all initially-selected unresolved areas complete:**
    - Summarize what was captured from the discussion so far
    - AskUserQuestion:
      - header: "Done"
@@ -438,7 +495,7 @@ Track deferred ideas internally.
 </step>
 
 <step name="write_context">
-Create CONTEXT.md capturing decisions made.
+Create/update CONTEXT.md capturing decisions made with idempotent upserts (no duplicate decision entries on reruns).
 
 **Find or create phase directory:**
 
@@ -450,6 +507,8 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ```
 
 **File location:** `${phase_dir}/${padded_phase}-CONTEXT.md`
+
+If file exists, merge unresolved decisions only and preserve existing content/audit notes.
 
 **Structure the content by what was discussed:**
 

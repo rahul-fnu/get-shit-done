@@ -287,7 +287,11 @@ Orchestrator parses → presents to user → spawns fresh continuation with your
 </step>
 
 <step name="verification_failure_gate">
-If verification fails: STOP. Present: "Verification failed for Task [X]: [name]. Expected: [criteria]. Actual: [result]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
+Read headless config: `HEADLESS=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get workflow.headless 2>/dev/null || echo "false")`
+
+If verification fails AND headless=true: auto-retry ONCE. If still fails: auto-skip (mark incomplete), log `⚠ HEADLESS: Verification failed, skipped after retry. Task: [name]`. Continue to next task. Record in SUMMARY "Issues Encountered".
+
+If verification fails AND headless=false: STOP. Present: "Verification failed for Task [X]: [name]. Expected: [criteria]. Actual: [result]." Options: Retry | Skip (mark incomplete) | Stop (investigate). If skipped → SUMMARY "Issues Encountered".
 </step>
 
 <step name="record_completion_time">

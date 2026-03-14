@@ -196,7 +196,7 @@ AUTO_CFG=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get workf
 When executor returns a checkpoint AND (`AUTO_CHAIN` is `"true"` OR `AUTO_CFG` is `"true"`):
 - **human-verify** → Auto-spawn continuation agent with `{user_response}` = `"approved"`. Log `⚡ Auto-approved checkpoint`.
 - **decision** → Auto-spawn continuation agent with `{user_response}` = first option from checkpoint details. Log `⚡ Auto-selected: [option]`.
-- **human-action** → Present to user (existing behavior below). Auth gates cannot be automated.
+- **human-action** → Read headless config: `HEADLESS=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get workflow.headless 2>/dev/null || echo "false")`. If headless=true: log `⚠ HEADLESS: Skipping human-action checkpoint (assumes pre-auth). Task: [task name]` and auto-spawn continuation agent with `{user_response}` = `"done"`. If headless=false: present to user (existing behavior below). Auth gates cannot be automated in interactive mode.
 
 **Standard flow (not auto-mode, or human-action type):**
 
@@ -328,7 +328,15 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 | `human_needed` | Present items for human testing, get approval or feedback |
 | `gaps_found` | Present gap summary, offer `/gsd:plan-phase {phase} --gaps` |
 
-**If human_needed:**
+**Headless overrides for verification status:**
+
+Read headless config: `HEADLESS=$(node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-get workflow.headless 2>/dev/null || echo "false")`
+
+**If human_needed AND headless=true:** Auto-approve with log: `⚠ HEADLESS: Auto-approved human verification items`. Proceed to update_roadmap.
+
+**If gaps_found AND headless=true:** Auto-chain to `/gsd:plan-phase {X} --gaps --auto` for one gap closure cycle, then continue regardless. Log: `⚠ HEADLESS: Auto-chaining gap closure for phase {X}`.
+
+**If human_needed (not headless):**
 ```
 ## ✓ Phase {X}: {Name} — Human Verification Required
 
@@ -339,7 +347,7 @@ All automated checks passed. {N} items need human testing:
 "approved" → continue | Report issues → gap closure
 ```
 
-**If gaps_found:**
+**If gaps_found (not headless):**
 ```
 ## ⚠ Phase {X}: {Name} — Gaps Found
 

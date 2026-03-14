@@ -62,6 +62,11 @@ function cmdConfigEnsureSection(cwd, raw) {
       plan_check: true,
       verifier: true,
       nyquist_validation: true,
+      headless: false,
+    },
+    discussion: {
+      mode: 'manual',
+      area_selection: 'manual',
     },
     parallelization: true,
     brave_search: hasBraveSearch,
@@ -70,6 +75,7 @@ function cmdConfigEnsureSection(cwd, raw) {
     ...hardcoded,
     ...userDefaults,
     workflow: { ...hardcoded.workflow, ...(userDefaults.workflow || {}) },
+    discussion: { ...hardcoded.discussion, ...(userDefaults.discussion || {}) },
   };
 
   try {
